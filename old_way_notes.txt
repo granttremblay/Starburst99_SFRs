@@ -1,0 +1,30 @@
+# ran a starburst99 model off web and called it normal
+# it gave me a normal.spectrum1 file containing uv spectra
+
+#to get the last time 1e8 years
+tail -n 1220 normal.spectrum1 >  spectrum_1e8.dat
+# has 1220 lines!
+
+# columns in this file are
+# time, lambda(AA), stellar+neb flux , stellar flux, neb flux
+# we want column 2 and 3
+# The Starburst99 spectrum is in units of ergs/s/A. 
+
+# use junk.awk to get a file with only col 2 and 3 in them
+awk -f junk.awk spectrum_1e8.dat > convert.inp
+
+
+# arguements z dlum npts
+# Dlum is in Mpc and you get it using the cosmology calculator
+# convert so flux in ergs/c/A/cm2
+convert3.out 0.1 10.0 1220 convert.inp > spec_a11.dat
+
+# run the above for each galaxy separately
+# but with correct redshifts and dlums
+
+#in pyraf
+stsdas.hst_calib.synphot
+calcphot "band(acs,sbc,f140lp)" spec=spec_a11.dat form=counts
+# this works and outputs counts/s
+
+
